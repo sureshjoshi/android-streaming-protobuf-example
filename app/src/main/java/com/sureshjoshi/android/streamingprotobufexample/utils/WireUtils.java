@@ -35,7 +35,7 @@ public class WireUtils {
         while (!source.exhausted()) {
             int size = source.readIntLe();
             byte[] bytes = source.readByteArray(size);
-            messages.add(adapter.decode(bytes)); // TODO: Reflect this or something
+            messages.add(adapter.decode(bytes));
         }
         return messages;
     }
