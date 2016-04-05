@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
                     .y((int) (Math.random() * 1000))
                     .build();
 
-            WireUtils.encodeWithLengthPrefix(outputStream, sample);
+            WireUtils.writeDelimitedTo(outputStream, sample);
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
 
         try {
             OutputStream outputStream = new BufferedOutputStream(openFileOutput(FILE_NAME, MODE_APPEND));
-            WireUtils.encodeWithLengthPrefix(outputStream, samples);
+            WireUtils.writeDelimitedTo(outputStream, samples);
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
         List<Sample> samples = new ArrayList<>();
         try {
             InputStream inputStream = new BufferedInputStream(openFileInput(FILE_NAME));
-            samples = WireUtils.decodeWithLengthPrefix(inputStream, Sample.ADAPTER);
+            samples = WireUtils.readDelimitedFrom(inputStream, Sample.ADAPTER);
             inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();

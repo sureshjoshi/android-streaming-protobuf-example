@@ -15,13 +15,13 @@ import okio.Okio;
 
 public class WireUtils {
 
-    public static void encodeWithLengthPrefix(OutputStream outputStream, List<Message> messages) throws IOException {
+    public static void writeDelimitedTo(OutputStream outputStream, List<Message> messages) throws IOException {
         for (Message message : messages) {
-            encodeWithLengthPrefix(outputStream, message);
+            writeDelimitedTo(outputStream, message);
         }
     }
 
-    public static void encodeWithLengthPrefix(OutputStream outputStream, Message message) throws IOException {
+    public static void writeDelimitedTo(OutputStream outputStream, Message message) throws IOException {
         int size = message.adapter().encodedSize(message);
         BufferedSink sink = Okio.buffer(Okio.sink(outputStream));
         sink.writeIntLe(size);
@@ -29,7 +29,7 @@ public class WireUtils {
         sink.emit();
     }
 
-    public static <M extends Message> List<M> decodeWithLengthPrefix(InputStream inputStream, ProtoAdapter<M> adapter) throws IOException {
+    public static <M extends Message> List<M> readDelimitedFrom(InputStream inputStream, ProtoAdapter<M> adapter) throws IOException {
         List<M> messages = new ArrayList<>();
         BufferedSource source = Okio.buffer(Okio.source(inputStream));
         while (!source.exhausted()) {
