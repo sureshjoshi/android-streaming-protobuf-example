@@ -39,4 +39,29 @@ public class WireUtils {
         }
         return messages;
     }
+
+    public static void writeCobsEncodedTo(OutputStream outputStream, List<Message> messages) throws IOException {
+        for (Message message : messages) {
+            writeCobsEncodedTo(outputStream, message);
+        }
+    }
+
+    public static void writeCobsEncodedTo(OutputStream outputStream, Message message) throws IOException {
+        BufferedSink sink = Okio.buffer(Okio.sink(outputStream));
+        sink.write(CobsUtils.encode(message.encode()));
+        sink.emit();
+    }
+
+    public static <M extends Message> List<M> readCobsEncodedFrom(InputStream inputStream, ProtoAdapter<M> adapter) throws IOException {
+        List<M> messages = new ArrayList<>();
+        BufferedSource source = Okio.buffer(Okio.source(inputStream));
+        while (!source.exhausted()) {
+            long length = source.indexOf((byte) 0);
+            byte[] decodedBytes = CobsUtils.decode(source.readByteArray(length + 1));
+            messages.add(adapter.decode(decodedBytes));
+        }
+        return messages;
+    }
+
+
 }

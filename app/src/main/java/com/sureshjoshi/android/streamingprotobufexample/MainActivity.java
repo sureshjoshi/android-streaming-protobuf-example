@@ -28,7 +28,8 @@ import butterknife.OnClick;
 public class MainActivity extends Activity {
 
     int mRunningX = 0;
-    static final String FILE_NAME = "samples.pbin";
+    static final String FILE_NAME = "samples.pbld";
+    static final String FILE_NAME_COBS = "samples.pbcobs1";
 
     @Bind(R.id.chart)
     LineChart mChart;
@@ -37,14 +38,18 @@ public class MainActivity extends Activity {
     void addOneSample() {
         // Create one random entry
         try {
-            OutputStream outputStream = new BufferedOutputStream(openFileOutput(FILE_NAME, MODE_APPEND));
             Sample sample = new Sample.Builder()
                     .x(++mRunningX)
                     .y((int) (Math.random() * 1000))
                     .build();
 
+            OutputStream outputStream = new BufferedOutputStream(openFileOutput(FILE_NAME, MODE_APPEND));
             WireUtils.writeDelimitedTo(outputStream, sample);
             outputStream.close();
+
+            OutputStream outputStreamCobs = new BufferedOutputStream(openFileOutput(FILE_NAME_COBS, MODE_APPEND));
+            WireUtils.writeCobsEncodedTo(outputStreamCobs, sample);
+            outputStreamCobs.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,6 +72,10 @@ public class MainActivity extends Activity {
             OutputStream outputStream = new BufferedOutputStream(openFileOutput(FILE_NAME, MODE_APPEND));
             WireUtils.writeDelimitedTo(outputStream, samples);
             outputStream.close();
+
+//            OutputStream outputStreamCobs = new BufferedOutputStream(openFileOutput(FILE_NAME_COBS, MODE_APPEND));
+//            WireUtils.writeCobsEncodedTo(outputStreamCobs, samples);
+//            outputStreamCobs.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,6 +92,10 @@ public class MainActivity extends Activity {
             InputStream inputStream = new BufferedInputStream(openFileInput(FILE_NAME));
             samples = WireUtils.readDelimitedFrom(inputStream, Sample.ADAPTER);
             inputStream.close();
+
+//            InputStream inputStreamCobs = new BufferedInputStream(openFileInput(FILE_NAME_COBS));
+//            samples = WireUtils.readCobsEncodedFrom(inputStreamCobs, Sample.ADAPTER);
+//            inputStreamCobs.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,5 +136,6 @@ public class MainActivity extends Activity {
 
         // Delete the file, if any, between onCreate calls.
         deleteFile(FILE_NAME);
+        deleteFile(FILE_NAME_COBS);
     }
 }
